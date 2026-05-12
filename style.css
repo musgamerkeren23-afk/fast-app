@@ -1,0 +1,21 @@
+body {
+  font-family: Arial;
+  background: #eaffea;
+  text-align: center;
+}
+
+h1 {
+  color: green;
+}
+
+input, button {
+  margin: 5px;
+  padding: 10px;
+}
+
+#chatBox {
+  border: 1px solid #ccc;
+  height: 150px;
+  overflow: auto;
+  margin: 10px;
+}
