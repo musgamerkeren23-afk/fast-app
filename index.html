@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fast Ride</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- LEAFLET CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+</head>
+<body>
+
+<h1>🟢 Fast Ride</h1>
+
+<!-- LOGIN -->
+<div id="login">
+  <input type="text" id="username" placeholder="Nama kamu">
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
+
+  <h3>Pesan Ojek</h3>
+
+  <!-- ✅ TOMBOL GPS -->
+  <button onclick="getLocation()">📍 Ambil Lokasi</button>
+
+  <input type="text" id="from" placeholder="Lokasi Jemput">
+  <input type="text" id="to" placeholder="Tujuan">
+
+  <button onclick="order()">Pesan Driver</button>
+
+  <p id="status"></p>
+
+  <h3>🗺️ Map</h3>
+  <div id="map" style="height:300px;"></div>
+
+  <h3>Chat</h3>
+  <div id="chatBox"></div>
+  <input type="text" id="chatInput">
+  <button onclick="sendChat()">Kirim</button>
+
+</div>
+
+<!-- LEAFLET JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- APP JS -->
+<script src="app.js"></script>
+
+</body>
+</html>
