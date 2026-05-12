@@ -12,6 +12,25 @@
 </head>
 <body>
 
+  <!-- 🔥 FIREBASE (WAJIB DI ATAS app.js) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "ISI",
+      authDomain: "ISI",
+      databaseURL: "ISI",
+      projectId: "ISI",
+      storageBucket: "ISI",
+      messagingSenderId: "ISI",
+      appId: "ISI"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
+
 <h1>🔵 Fast Driver</h1>
 
 <button onclick="toggleFSO()" id="fsoBtn">🚀 FSO OFF</button>
