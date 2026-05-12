@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Fast Driver</title>
+
+  <!-- STYLE -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- LEAFLET CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+</head>
+<body>
+
+<h1>🔵 Fast Driver</h1>
+
+<button onclick="toggleFSO()" id="fsoBtn">🚀 FSO OFF</button>
+
+<h3>Order Masuk</h3>
+<p id="orderBox">Belum ada order</p>
+
+<button onclick="cancelOrder()">❌ Cancel</button>
+<button onclick="finishOrder()">✅ Selesai</button>
+
+<h3>🗺️ Map Driver</h3>
+<div id="map" style="height:300px;margin:10px;"></div>
+
+<h3>Chat</h3>
+<div id="chatBox"></div>
+<input type="text" id="chatInput">
+<button onclick="sendChat()">Kirim</button>
+
+<!-- LEAFLET JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- APP JS -->
+<script src="app.js"></script>
+
+</body>
+  </html>
