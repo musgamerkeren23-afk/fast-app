@@ -3,57 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <title>Fast Driver</title>
-
-  <!-- STYLE -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- LEAFLET CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 </head>
 <body>
 
-  <!-- 🔥 FIREBASE (WAJIB DI ATAS app.js) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "ISI",
-      authDomain: "ISI",
-      databaseURL: "ISI",
-      projectId: "ISI",
-      storageBucket: "ISI",
-      messagingSenderId: "ISI",
-      appId: "ISI"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-  </script>
-
 <h1>🔵 Fast Driver</h1>
 
-<button onclick="toggleFSO()" id="fsoBtn">🚀 FSO OFF</button>
+<h3 id="orderBox">Menunggu order...</h3>
 
-<h3>Order Masuk</h3>
-<p id="orderBox">Belum ada order</p>
+<button onclick="acceptOrder()">✅ Terima</button>
+<button onclick="finishOrder()">🏁 Selesai</button>
 
-<button onclick="cancelOrder()">❌ Cancel</button>
-<button onclick="finishOrder()">✅ Selesai</button>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-<h3>🗺️ Map Driver</h3>
-<div id="map" style="height:300px;margin:10px;"></div>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBBvm4Q6LKDrUwcyF4bwDuWKrEHlRwcWaU",
+  authDomain: "fast--app.firebaseapp.com",
+  databaseURL: "https://fast--app-default-rtdb.firebaseio.com",
+  projectId: "fast--app",
+  storageBucket: "fast--app.firebasestorage.app",
+  messagingSenderId: "900506052647",
+  appId: "1:900506052647:web:3050552184e2b3fc5e4602"
+};
 
-<h3>Chat</h3>
-<div id="chatBox"></div>
-<input type="text" id="chatInput">
-<button onclick="sendChat()">Kirim</button>
+// ✅ FIX DOUBLE INIT
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+</script>
 
-<!-- LEAFLET JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+let currentOrder = null;
 
-<!-- APP JS -->
-<script src="app.js"></script>
+// 🔥 FSO REAL
+db.ref("orders").on("value", (snap) => {
+  const order = snap.val();
+
+  if (!order) {
+    document.getElementById("orderBox").innerText = "Belum ada order";
+    return;
+  }
+
+  currentOrder = order;
+
+  document.getElementById("orderBox").innerText =
+    "🚨 " + order.user +
+    "\n📍 " + order.from + " → " + order.to +
+    "\n💰 Rp " + order.price +
+    "\n📊 " + order.status;
+});
+
+// ACCEPT
+function acceptOrder() {
+  if (!currentOrder) return;
+
+  db.ref("orders/status").set("🚗 Driver menuju lokasi...");
+}
+
+// FINISH
+function finishOrder() {
+  db.ref("orders").remove();
+}
+</script>
 
 </body>
-  </html>
+</html>
