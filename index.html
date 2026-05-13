@@ -3,28 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>Fast Ride</title>
-
-  <link rel="stylesheet" href="style.css">
-
-  <!-- LEAFLET CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 </head>
 <body>
 
 <h1>🟢 Fast Ride</h1>
 
-<!-- LOGIN -->
 <div id="login">
   <input type="text" id="username" placeholder="Nama kamu">
   <button onclick="login()">Login</button>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
-
-  <h3>Pesan Ojek</h3>
-
-  <!-- ✅ TOMBOL GPS -->
   <button onclick="getLocation()">📍 Ambil Lokasi</button>
 
   <input type="text" id="from" placeholder="Lokasi Jemput">
@@ -33,22 +22,90 @@
   <button onclick="order()">Pesan Driver</button>
 
   <p id="status"></p>
-
-  <h3>🗺️ Map</h3>
-  <div id="map" style="height:300px;"></div>
-
-  <h3>Chat</h3>
-  <div id="chatBox"></div>
-  <input type="text" id="chatInput">
-  <button onclick="sendChat()">Kirim</button>
-
 </div>
 
-<!-- LEAFLET JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-<!-- APP JS -->
-<script src="app.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBBvm4Q6LKDrUwcyF4bwDuWKrEHlRwcWaU",
+  authDomain: "fast--app.firebaseapp.com",
+  databaseURL: "https://fast--app-default-rtdb.firebaseio.com",
+  projectId: "fast--app",
+  storageBucket: "fast--app.firebasestorage.app",
+  messagingSenderId: "900506052647",
+  appId: "1:900506052647:web:3050552184e2b3fc5e4602"
+};
+
+// ✅ FIX DOUBLE INIT
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+</script>
+
+<script>
+let userRealLat;
+let userRealLng;
+
+function login() {
+  const name = document.getElementById("username").value;
+  localStorage.setItem("user", name);
+
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "block";
+}
+
+// GPS
+function getLocation() {
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      userRealLat = pos.coords.latitude;
+      userRealLng = pos.coords.longitude;
+      alert("📍 Lokasi siap!");
+    },
+    (err) => {
+      alert("❌ GPS error: " + err.message);
+    }
+  );
+}
+
+// ORDER
+function order() {
+  if (!userRealLat) {
+    alert("Ambil lokasi dulu!");
+    return;
+  }
+
+  const orderData = {
+    user: localStorage.getItem("user"),
+    from: document.getElementById("from").value,
+    to: document.getElementById("to").value,
+    lat: userRealLat,
+    lng: userRealLng,
+    price: Math.round((Math.random() * 5 + 1) * 2000),
+    status: "🚕 Mencari driver..."
+  };
+
+  db.ref("orders").set(orderData);
+
+  alert("Order dikirim 🔥");
+}
+
+// LISTEN STATUS
+db.ref("orders").on("value", (snap) => {
+  const data = snap.val();
+
+  if (!data) {
+    document.getElementById("status").innerText = "Belum ada order";
+    return;
+  }
+
+  document.getElementById("status").innerText = data.status;
+});
+</script>
 
 </body>
 </html>
