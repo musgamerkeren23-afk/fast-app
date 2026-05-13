@@ -9,20 +9,29 @@
 <h1>🟢 Fast Ride</h1>
 
 <div id="login">
-  <input type="text" id="username" placeholder="Nama kamu">
+  <input id="username" placeholder="Nama">
   <button onclick="login()">Login</button>
 </div>
 
 <div id="app" style="display:none;">
   <button onclick="getLocation()">📍 Ambil Lokasi</button>
-
-  <input type="text" id="from" placeholder="Lokasi Jemput">
-  <input type="text" id="to" placeholder="Tujuan">
-
-  <button onclick="order()">Pesan Driver</button>
+  <input id="from" placeholder="Dari">
+  <input id="to" placeholder="Ke">
+  <button onclick="order()">Pesan</button>
 
   <p id="status"></p>
+
+  <div id="map" style="height:300px;"></div>
+
+  <h3>💬 Chat</h3>
+  <input id="chatInput">
+  <button onclick="sendChat()">Kirim</button>
+  <div id="chatBox"></div>
 </div>
+
+<!-- MAP -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -34,76 +43,72 @@ const firebaseConfig = {
   authDomain: "fast--app.firebaseapp.com",
   databaseURL: "https://fast--app-default-rtdb.firebaseio.com",
   projectId: "fast--app",
-  storageBucket: "fast--app.firebasestorage.app",
-  messagingSenderId: "900506052647",
-  appId: "1:900506052647:web:3050552184e2b3fc5e4602"
+  appId: "1:900506052647:web:xxx"
 };
 
-// ✅ FIX DOUBLE INIT
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-</script>
 
-<script>
-let userRealLat;
-let userRealLng;
+let userRealLat, userRealLng, map;
 
-function login() {
-  const name = document.getElementById("username").value;
-  localStorage.setItem("user", name);
-
-  document.getElementById("login").style.display = "none";
-  document.getElementById("app").style.display = "block";
+function login(){
+  localStorage.setItem("user", username.value);
+  login.style.display="none";
+  app.style.display="block";
+  initMap();
 }
 
-// GPS
-function getLocation() {
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      userRealLat = pos.coords.latitude;
-      userRealLng = pos.coords.longitude;
-      alert("📍 Lokasi siap!");
-    },
-    (err) => {
-      alert("❌ GPS error: " + err.message);
-    }
-  );
+function initMap(lat=-6.2,lng=106.8){
+  map = L.map('map').setView([lat,lng],13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 }
 
-// ORDER
-function order() {
-  if (!userRealLat) {
-    alert("Ambil lokasi dulu!");
-    return;
-  }
+function getLocation(){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    userRealLat = pos.coords.latitude;
+    userRealLng = pos.coords.longitude;
 
-  const orderData = {
+    map.setView([userRealLat,userRealLng],15);
+    L.marker([userRealLat,userRealLng]).addTo(map);
+
+    alert("GPS aktif 🔥");
+  });
+}
+
+function order(){
+  if(!userRealLat) return alert("Ambil lokasi dulu!");
+
+  const data={
     user: localStorage.getItem("user"),
-    from: document.getElementById("from").value,
-    to: document.getElementById("to").value,
-    lat: userRealLat,
-    lng: userRealLng,
-    price: Math.round((Math.random() * 5 + 1) * 2000),
-    status: "🚕 Mencari driver..."
+    from: from.value,
+    to: to.value,
+    lat:userRealLat,
+    lng:userRealLng,
+    price: Math.round(Math.random()*10000),
+    status:"🚕 Mencari driver..."
   };
 
-  db.ref("orders").set(orderData);
-
-  alert("Order dikirim 🔥");
+  db.ref("orders").set(data);
 }
 
-// LISTEN STATUS
-db.ref("orders").on("value", (snap) => {
-  const data = snap.val();
+// STATUS
+db.ref("orders").on("value",snap=>{
+  const d=snap.val();
+  if(!d) return status.innerText="Tidak ada order";
+  status.innerText=d.status;
+});
 
-  if (!data) {
-    document.getElementById("status").innerText = "Belum ada order";
-    return;
-  }
+// CHAT
+function sendChat(){
+  db.ref("chat").push({
+    user: localStorage.getItem("user"),
+    msg: chatInput.value
+  });
+}
 
-  document.getElementById("status").innerText = data.status;
+db.ref("chat").on("child_added",snap=>{
+  const d=snap.val();
+  chatBox.innerHTML += `<p><b>${d.user}:</b> ${d.msg}</p>`;
 });
 </script>
 
